@@ -10,7 +10,8 @@ import BackButton from '../components/BackButton'
 import { theme } from '../core/theme'
 import { nameValidator } from '../helpers/nameValidator'
 import { db } from '../../firebase'
-import { collection, getDocs } from 'firebase/firestore/lite';
+import { collection, doc, getDocs, setDoc } from 'firebase/firestore';
+
 
 export default function CreateScreen({ navigation }) {
   const [name, setName] = useState({ value: '', error: '' })
@@ -23,11 +24,14 @@ export default function CreateScreen({ navigation }) {
     }
     
     var code = await createCode()
-    console.warn(code)
+
+    await setDoc(doc(db, "rooms", code), {
+      players: [name.value]
+    });
 
     navigation.reset({
       index: 0,
-      routes: [{ name: 'Dashboard' }],
+      routes: [{ name: 'Dashboard', params: {code: code} }],
     })
   }
 

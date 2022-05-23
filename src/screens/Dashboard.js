@@ -4,12 +4,17 @@ import Logo from '../components/Logo'
 import Header from '../components/Header'
 import Paragraph from '../components/Paragraph'
 import Button from '../components/Button'
+import { doc, getDoc } from 'firebase/firestore';
 
-export default function Dashboard({ navigation }) {
+export default async function Dashboard({ route, navigation }) {
+  const { code } = route.params;
+  console.warn(code)
+  // var data = (await getDoc(doc(db, 'rooms', code.value))).data()
+  // var players = data['players']
   return (
     <Background>
       <Logo />
-      <Header>Let’s start</Header>
+      <Header>ss</Header>
       <Paragraph>
         Your amazing app starts here. Open you favorite code editor and start
         editing this project.

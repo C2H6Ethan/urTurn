@@ -10,6 +10,8 @@ import BackButton from '../components/BackButton'
 import { theme } from '../core/theme'
 import { nameValidator } from '../helpers/nameValidator'
 import { codeValidator } from '../helpers/codeValidator'
+import { db } from '../../firebase'
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 export default function JoinScreen({ navigation }) {
   const [name, setName] = useState({ value: '', error: '' })
@@ -23,9 +25,18 @@ export default function JoinScreen({ navigation }) {
       setCode({ ...code, error: codeError })
       return
     }
+
+    var data = (await getDoc(doc(db, 'rooms', code.value))).data()
+    var players = data['players']
+    players.push(name.value)
+
+    await updateDoc(doc(db, 'rooms', code.value), {
+      players: players
+    })
+
     navigation.reset({
       index: 0,
-      routes: [{ name: 'Dashboard' }],
+      routes: [{ name: 'Dashboard', params: {code: code.value} }],
     })
   }
 
