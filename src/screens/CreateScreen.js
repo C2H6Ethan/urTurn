@@ -24,14 +24,16 @@ export default function CreateScreen({ navigation }) {
     }
     
     var code = await createCode()
+    var player = {id: 0, name:name.value}
 
     await setDoc(doc(db, "rooms", code), {
-      players: [name.value]
+      players: [player],
+      totalJoins: 1,
     });
 
     navigation.reset({
       index: 0,
-      routes: [{ name: 'Dashboard', params: {code: code} }],
+      routes: [{ name: 'Dashboard', params: {code: code, player: player} }],
     })
   }
 

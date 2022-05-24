@@ -28,15 +28,18 @@ export default function JoinScreen({ navigation }) {
 
     var data = (await getDoc(doc(db, 'rooms', code.value))).data()
     var players = data['players']
-    players.push(name.value)
+    var totalJoins = data['totalJoins']
+    var player = {id: totalJoins, name:name.value}
+    players.push(player)
 
     await updateDoc(doc(db, 'rooms', code.value), {
-      players: players
+      players: players,
+      totalJoins: totalJoins + 1
     })
 
     navigation.reset({
       index: 0,
-      routes: [{ name: 'Dashboard', params: {code: code.value} }],
+      routes: [{ name: 'Dashboard', params: {code: code.value, player: player} }],
     })
   }
 
