@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import Background from '../components/Background'
 import Logo from '../components/Logo'
 import Header from '../components/Header'
+import Nametag from "../components/Nametag";
 import Paragraph from '../components/Paragraph'
 import Button from '../components/Button'
 import { db } from '../../firebase'
-import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 
 export default function Dashboard({ route, navigation }) {
   const { code } = route.params;
@@ -15,17 +16,30 @@ export default function Dashboard({ route, navigation }) {
   const [error, setError] = useState();
 
   useEffect(async() => {
-    if (code) {
+    fetchPlayers();
+    const unsub = onSnapshot(doc(db, "rooms", code), (doc) => {
+      fetchPlayers();
+    });
+    return () => {
+      console.log("bruh")
+      leaveRoom();
+    };
+  }, []);
+
+
+  const fetchPlayers = async() => {
+    if (code){
       await getDoc(doc(db, 'rooms', code))
         .then(room => {
           if (room.exists) {
-            var players = room.data()['players']
-            var index = players.findIndex(x => x.id === player['id']);
-            var otherPlayers = players.splice(index, 1)
-            console.warn(otherPlayers)
+            var newPlayers = room.data()['players']
+            var otherPlayers = room.data()['players']
+            var index = newPlayers.findIndex(x => x.id === player['id']);
+            otherPlayers.splice(index, 1)
             setError(null);
-            setPlayers(players);
+            setPlayers(newPlayers);
             setOtherPlayers(otherPlayers)
+            
           } else {
             setError('players-not-found');
             setPlayers();
@@ -34,7 +48,8 @@ export default function Dashboard({ route, navigation }) {
         })
         .catch(() => setError('players-get-fail'));
     }
-  });
+  }
+
 
   const leaveRoom = async() =>{
     navigation.reset({
@@ -60,9 +75,9 @@ export default function Dashboard({ route, navigation }) {
   // var players = data['players']
   return (
     <Background>
+      <Nametag>{player['name']}</Nametag>
       <Header>{code}</Header>
       <Logo />
-      <Header>{player['name']}</Header>
       { otherPlayers?.map((player) => (
         <Paragraph>{player['name']}</Paragraph>
         ))

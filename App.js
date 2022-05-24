@@ -25,9 +25,6 @@ export default class App extends Component {
     };
   }
 
-  componentDidMount = async() => {
-    // this.getRooms();
-  }
 
   // Get a list of rooms from database
   getRooms = async () => {
