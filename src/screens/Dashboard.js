@@ -13,6 +13,7 @@ export default function Dashboard({ route, navigation }) {
   const { player } = route.params;
   const [players, setPlayers] = useState();
   const [otherPlayers, setOtherPlayers] = useState();
+  const [playerNames, setPlayerNames] = useState();
   const [error, setError] = useState();
 
   useEffect(async() => {
@@ -34,11 +35,16 @@ export default function Dashboard({ route, navigation }) {
           if (room.exists) {
             var newPlayers = room.data()['players']
             var otherPlayers = room.data()['players']
+            var namesOnly = []
+            newPlayers.forEach(player => {
+              namesOnly.push(player['name'])
+            });
             var index = newPlayers.findIndex(x => x.id === player['id']);
             otherPlayers.splice(index, 1)
             setError(null);
             setPlayers(newPlayers);
-            setOtherPlayers(otherPlayers)
+            setOtherPlayers(otherPlayers);
+            setPlayerNames(namesOnly);
             
           } else {
             setError('players-not-found');
@@ -82,6 +88,12 @@ export default function Dashboard({ route, navigation }) {
         <Paragraph>{player['name']}</Paragraph>
         ))
       }
+      <Button
+        mode="contained"
+        onPress={() => navigation.navigate('WheelOfFortune', {playerNames})}
+      >
+        Spin the Wheel
+      </Button>
       <Button
         mode="outlined"
         onPress={() => leaveRoom()}
