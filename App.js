@@ -10,6 +10,7 @@ import {
   ResetPasswordScreen,
   Dashboard,
   WheelOfFortuneScreen,
+  FlappyBeer
 } from './src/screens'
 import { db } from './firebase'
 import { collection, getDocs } from 'firebase/firestore';
@@ -54,6 +55,7 @@ export default class App extends Component {
               component={ResetPasswordScreen}
             />
             <Stack.Screen name="WheelOfFortune" component={WheelOfFortuneScreen} />
+            <Stack.Screen name="FlappyBeer" component={FlappyBeer} />
           </Stack.Navigator>
         </NavigationContainer>
       </Provider>

@@ -17,42 +17,30 @@ export default function Dashboard({ route, navigation }) {
   const [error, setError] = useState();
 
   useEffect(async() => {
-    fetchPlayers();
+    // fetchPlayers();
     const unsub = onSnapshot(doc(db, "rooms", code), (doc) => {
-      fetchPlayers();
+      if(doc.data() != null){
+        if(doc.data()['flappyBeer']['isRunning'] == true){console.log("flappy beer has started"); navigation.navigate('FlappyBeer', {player, code})}
+        fetchPlayers(doc);
+      }
+      
     });
-    return () => {
-      console.log("bruh")
-      leaveRoom();
-    };
   }, []);
 
 
-  const fetchPlayers = async() => {
-    if (code){
-      await getDoc(doc(db, 'rooms', code))
-        .then(room => {
-          if (room.exists) {
-            var newPlayers = room.data()['players']
-            var otherPlayers = room.data()['players']
-            var namesOnly = []
-            newPlayers.forEach(player => {
-              namesOnly.push(player['name'])
-            });
-            var index = newPlayers.findIndex(x => x.id === player['id']);
-            otherPlayers.splice(index, 1)
-            setError(null);
-            setPlayers(newPlayers);
-            setOtherPlayers(otherPlayers);
-            setPlayerNames(namesOnly);
-            
-          } else {
-            setError('players-not-found');
-            setPlayers();
-            setOtherPlayers();
-          }
-        })
-        .catch(() => setError('players-get-fail'));
+  const fetchPlayers = async(doc) => {
+    if(code){
+      var newPlayers = doc.data()['players']
+      var otherPlayers = doc.data()['players']
+      var namesOnly = []
+      newPlayers.forEach(player => {
+        namesOnly.push(player['name'])
+      });
+      var index = newPlayers.findIndex(x => x.id === player['id']);
+      otherPlayers.splice(index, 1)
+      setPlayers(newPlayers);
+      setOtherPlayers(otherPlayers);
+      setPlayerNames(namesOnly);
     }
   }
 
@@ -77,6 +65,12 @@ export default function Dashboard({ route, navigation }) {
     }
   }
 
+  const startFlappyBeer = async() =>{
+    await updateDoc(doc(db, 'rooms', code), {
+      flappyBeer: {isRunning: true}
+    })
+  }
+
   // var data = (await getDoc(doc(db, 'rooms', code.value))).data()
   // var players = data['players']
   return (
@@ -90,9 +84,15 @@ export default function Dashboard({ route, navigation }) {
       }
       <Button
         mode="contained"
-        onPress={() => navigation.navigate('WheelOfFortune', {playerNames})}
+        onPress={() => navigation.navigate('WheelOfFortune', {player, players, playerNames})}
       >
         Spin the Wheel
+      </Button>
+      <Button
+        mode="contained"
+        onPress={() => startFlappyBeer()}
+      >
+        Flappy Beer
       </Button>
       <Button
         mode="outlined"

@@ -28,6 +28,7 @@ export default function CreateScreen({ navigation }) {
 
     await setDoc(doc(db, "rooms", code), {
       players: [player],
+      flappyBeer: {isRunning: false},
       totalJoins: 1,
     });
 
