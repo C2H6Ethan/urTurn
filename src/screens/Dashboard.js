@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
+import { View, StyleSheet } from 'react-native'
 import Background from '../components/Background'
 import Logo from '../components/Logo'
 import Header from '../components/Header'
 import Nametag from "../components/Nametag";
 import Paragraph from '../components/Paragraph'
 import Button from '../components/Button'
+import SpinTheWheelButton from "../components/SpinTheWheelButton";
 import { db } from '../../firebase'
 import { doc, getDoc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 
@@ -78,11 +80,18 @@ export default function Dashboard({ route, navigation }) {
       <Nametag>{player['name']}</Nametag>
       <Header>{code}</Header>
       <Logo />
-      { otherPlayers?.map((player) => (
-        <Paragraph>{player['name']}</Paragraph>
-        ))
-      }
-      <Button
+      <View style={styles.namesContainer}>
+        { otherPlayers?.map((player) => (
+          <Paragraph style={styles.playerName}>{player['name']}</Paragraph>
+          ))
+        }
+      </View>
+      
+      <View style={styles.gameModes}>
+        <SpinTheWheelButton gameImage={require('../assets/spin_the_wheel.png')} onPress={() => navigation.navigate('WheelOfFortune', {player, players, playerNames})}/>
+        <SpinTheWheelButton gameImage={require('../assets/flappy_beer_full.png')} onPress={() => startFlappyBeer()}/>
+      </View>
+      {/* <Button
         mode="contained"
         onPress={() => navigation.navigate('WheelOfFortune', {player, players, playerNames})}
       >
@@ -93,7 +102,7 @@ export default function Dashboard({ route, navigation }) {
         onPress={() => startFlappyBeer()}
       >
         Flappy Beer
-      </Button>
+      </Button> */}
       <Button
         mode="outlined"
         onPress={() => leaveRoom()}
@@ -103,3 +112,20 @@ export default function Dashboard({ route, navigation }) {
     </Background>
   )
 }
+
+const styles = StyleSheet.create({
+  gameModes: {
+    flexDirection: "row",
+    flexWrap: 'wrap',
+  },
+  namesContainer: {
+    maxWidth: 150,
+    flexDirection: "row",
+    flexWrap: 'wrap',
+    alignItems: 'flex-start',
+    justifyContent: 'space-around',
+  },
+  playerName: {
+    marginHorizontal: 10,
+  },
+})

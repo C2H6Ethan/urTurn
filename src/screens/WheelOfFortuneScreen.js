@@ -31,7 +31,6 @@ export default function WheelOfFortuneScreen({ route, navigation }) {
 
   const wheelOptions = {
     rewards: participants,
-    winner: 1,
     knobSize: 25,
     borderWidth: 5,
     borderColor: '#560cce',
