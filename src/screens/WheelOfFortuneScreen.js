@@ -12,22 +12,24 @@ import Button from '../components/Button'
 import BackButton from '../components/BackButton'
 import WheelOfFortune from 'react-native-wheel-of-fortune'
 import { theme } from '../core/theme';
+import { db } from '../../firebase'
+import { doc, getDoc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
+import { set } from 'react-native-reanimated';
 
 export default function WheelOfFortuneScreen({ route, navigation }) {
   const { player } = route.params;
   const { playerNames } = route.params;
   const { players } = route.params;
+  const { code } = route.params;
+  const { winnerIndex } = route.params;
   const [child, setChild] = useState();
   const [loserModalVisible, setLoserModalVisible] = useState(false)
   const [loserText, setLoserText] = useState("")
   const [winnerModalVisible, setWinnerModalVisible] = useState(false)
   const participants = playerNames;
 
-  useEffect(() => {
-    // child._onPress()
-  }, []);
-
   const wheelOptions = {
+    winner: winnerIndex,
     rewards: participants,
     knobSize: 25,
     borderWidth: 5,
@@ -37,15 +39,13 @@ export default function WheelOfFortuneScreen({ route, navigation }) {
     backgroundColor: '#560cce',
     textAngle: 'horizontal',
     knobSource: require('../assets/knob.png'),
-    onRef: ref => (setChild(ref)),
+    onRef: ref => (spinWheel(ref)),
   };
 
   const wheelSpinFinish = async(value, index) => {
-    console.log(players)
     var loser = players[index]
     //check if you lost game
     if(loser['id'] == player['id']){
-      console.log("u lost")
       //show loser modal
       setLoserModalVisible(true)
     }
@@ -55,10 +55,17 @@ export default function WheelOfFortuneScreen({ route, navigation }) {
       setWinnerModalVisible(true)
     }
 
-    await new Promise(resolve => setTimeout(resolve, 2000)); 
+    await updateDoc(doc(db, 'rooms', code), {
+      wheelSpin: {isRunning: false}
+    })
+    await new Promise(resolve => setTimeout(resolve, 2000));
     setWinnerModalVisible(false)
     setLoserModalVisible(false)
     navigation.navigate('Dashboard')
+  }
+
+  const spinWheel = (ref) => {
+    if(ref){ref._onPress()}
   }
 
   return (
@@ -96,13 +103,11 @@ export default function WheelOfFortuneScreen({ route, navigation }) {
         </View>
       </Modal>
 
-      <BackButton goBack={navigation.goBack} />
       <WheelOfFortune
         options={wheelOptions}
         getWinner={(value, index) => {wheelSpinFinish(value, index)}
         }
       />
-      <Button mode="contained" onPress={ () => { child._onPress() } }> Spin! </Button>
         
     </Background>
     // <Background>

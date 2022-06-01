@@ -27,7 +27,6 @@ export default function FlappyBeerScreen({ route, navigation }) {
   const stopGame = async(loser) => {
     //check if you lost game
     if(loser['userId'] == player['id']){
-      console.log("u lost")
       //show loser modal
       setLoserModalVisible(true)
     }

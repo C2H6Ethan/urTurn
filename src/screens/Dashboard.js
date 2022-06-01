@@ -26,28 +26,36 @@ export default function Dashboard({ route, navigation }) {
     // fetchPlayers();
     const unsub = onSnapshot(doc(db, "rooms", code), (doc) => {
       if(doc.data() != null){
-        if(doc.data()['flappyBeer']['isRunning'] == true){console.log("flappy beer has started"); navigation.navigate('FlappyBeer', {player, code})}
-        fetchPlayers(doc);
+        if(doc.data()['flappyBeer']['isRunning'] == true){navigation.navigate('FlappyBeer', {player, code})}
+        else if(doc.data()['wheelSpin']['isRunning'] == true){
+          var players = doc.data()['players']
+          var playerNames = []
+          var winnerIndex = doc.data()['wheelSpin']['winnerIndex']
+          players.forEach(player => {
+            playerNames.push(player['name'])
+          });
+          navigation.navigate('WheelOfFortune', {player, players, playerNames, code, winnerIndex})
+        }
+        else{fetchPlayers(doc)}
       }
-      
     });
   }, []);
 
   const fetchPlayers = async(doc) => {
     if(code){
-      var data = doc.data()
-      var newPlayers = data['players']
-      var otherPlayers = data['players']
+      var newPlayers = doc.data()['players']
+      var otherPlayers = doc.data()['players']
+      var newAdmin = doc.data()['admin']
       var namesOnly = []
       newPlayers.forEach(player => {
         namesOnly.push(player['name'])
       });
       var index = newPlayers.findIndex(x => x.id === player['id']);
       otherPlayers.splice(index, 1)
-      setPlayers(data['players']);
+      setPlayers(doc.data()['players']);
       setOtherPlayers(otherPlayers);
       setPlayerNames(namesOnly);
-      setAdmin(data['admin']);
+      setAdmin(newAdmin);
     }
   }
 
@@ -75,6 +83,13 @@ export default function Dashboard({ route, navigation }) {
   const startFlappyBeer = async() =>{
     await updateDoc(doc(db, 'rooms', code), {
       flappyBeer: {isRunning: true}
+    })
+  }
+
+  const startWheelSpin = async() =>{
+    var winnerIndex = Math.floor(Math.random() * (players.length))
+    await updateDoc(doc(db, 'rooms', code), {
+      wheelSpin: {isRunning: true, winnerIndex: winnerIndex}
     })
   }
   
@@ -119,12 +134,12 @@ export default function Dashboard({ route, navigation }) {
       
       { player['isAdmin']? 
         <View style={styles.gameModes}>
-          <GameModeButton gameImage={require('../assets/spin_the_wheel.png')} onPress={() => navigation.navigate('WheelOfFortune', {player, players, playerNames})}/>
+          <GameModeButton gameImage={require('../assets/spin_the_wheel.png')} onPress={() => startWheelSpin()}/>
           <GameModeButton gameImage={require('../assets/flappy_beer.png')} onPress={() => startFlappyBeer()}/>
         </View>
        : <View style={styles.gameModes}>
-          <GameModeButton gameImage={require('../assets/spin_the_wheel_gray.png')} onPress={() => showNotifyModal("ask " + admin['name'] + " to chose a game!")}/>
-          <GameModeButton gameImage={require('../assets/flappy_beer_gray.png')} onPress={() => showNotifyModal("ask " + admin['name'] + " to chose a game!")}/>
+          <GameModeButton gameImage={require('../assets/spin_the_wheel_gray.png')} onPress={() => showNotifyModal("ask " + admin['name'] + " to choose a game!")}/>
+          <GameModeButton gameImage={require('../assets/flappy_beer_gray.png')} onPress={() => showNotifyModal("ask " + admin['name'] + " to choose a game!")}/>
         </View>
       }
       
