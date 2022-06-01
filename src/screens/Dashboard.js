@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet } from 'react-native'
+import { View, StyleSheet, Modal, Text } from 'react-native'
 import Background from '../components/Background'
 import Logo from '../components/Logo'
 import Header from '../components/Header'
 import Nametag from "../components/Nametag";
 import Paragraph from '../components/Paragraph'
 import Button from '../components/Button'
-import SpinTheWheelButton from "../components/SpinTheWheelButton";
+import GameModeButton from "../components/GameModeButton";
 import { db } from '../../firebase'
 import { doc, getDoc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
+import { theme } from '../core/theme'
 
 export default function Dashboard({ route, navigation }) {
   const { code } = route.params;
@@ -28,7 +29,6 @@ export default function Dashboard({ route, navigation }) {
       
     });
   }, []);
-
 
   const fetchPlayers = async(doc) => {
     if(code){
@@ -73,10 +73,12 @@ export default function Dashboard({ route, navigation }) {
     })
   }
 
+
   // var data = (await getDoc(doc(db, 'rooms', code.value))).data()
   // var players = data['players']
   return (
     <Background>
+
       <Nametag>{player['name']}</Nametag>
       <Header>{code}</Header>
       <Logo />
@@ -88,8 +90,8 @@ export default function Dashboard({ route, navigation }) {
       </View>
       
       <View style={styles.gameModes}>
-        <SpinTheWheelButton gameImage={require('../assets/spin_the_wheel.png')} onPress={() => navigation.navigate('WheelOfFortune', {player, players, playerNames})}/>
-        <SpinTheWheelButton gameImage={require('../assets/flappy_beer_full.png')} onPress={() => startFlappyBeer()}/>
+        <GameModeButton gameImage={require('../assets/spin_the_wheel.png')} onPress={() => navigation.navigate('WheelOfFortune', {player, players, playerNames})}/>
+        <GameModeButton gameImage={require('../assets/flappy_beer.png')} onPress={() => startFlappyBeer()}/>
       </View>
       {/* <Button
         mode="contained"
@@ -127,5 +129,28 @@ const styles = StyleSheet.create({
   },
   playerName: {
     marginHorizontal: 10,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22
+  },
+  modalView: {
+    margin: 20,
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+  },
+  modalText: {
+    textAlign: "center",
+    fontSize: 30,
   },
 })
