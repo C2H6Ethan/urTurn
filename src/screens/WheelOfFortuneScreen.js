@@ -17,8 +17,6 @@ export default function WheelOfFortuneScreen({ route, navigation }) {
   const { player } = route.params;
   const { playerNames } = route.params;
   const { players } = route.params;
-  const [loserValue, setLoserValue] = useState();
-  const [loserIndex, setLoserIndex] = useState();
   const [child, setChild] = useState();
   const [loserModalVisible, setLoserModalVisible] = useState(false)
   const [loserText, setLoserText] = useState("")
@@ -43,11 +41,8 @@ export default function WheelOfFortuneScreen({ route, navigation }) {
   };
 
   const wheelSpinFinish = async(value, index) => {
-    setLoserValue(value) 
-    setLoserIndex(index)
-
+    console.log(players)
     var loser = players[index]
-
     //check if you lost game
     if(loser['id'] == player['id']){
       console.log("u lost")
@@ -163,7 +158,7 @@ const styles = StyleSheet.create({
     marginTop: 22
   },
   modalView: {
-    backgroundColor: theme.colors.secondary,
+    backgroundColor: theme.colors.primary,
     margin: 20,
     borderRadius: 20,
     padding: 35,

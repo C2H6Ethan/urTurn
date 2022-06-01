@@ -24,12 +24,13 @@ export default function CreateScreen({ navigation }) {
     }
     
     var code = await createCode()
-    var player = {id: 0, name:name.value}
+    var player = {id: 0, name:name.value, isAdmin: true}
 
     await setDoc(doc(db, "rooms", code), {
       players: [player],
       flappyBeer: {isRunning: false},
       totalJoins: 1,
+      admin: player
     });
 
     navigation.reset({

@@ -27,14 +27,6 @@ export default class App extends Component {
     };
   }
 
-
-  // Get a list of rooms from database
-  getRooms = async () => {
-    const roomsCol = collection(db, 'rooms');
-    const roomsSnapshot = await getDocs(roomsCol);
-    const roomsList = roomsSnapshot.docs.map(doc => doc.data());
-    console.warn(roomsList)
-  }
  
   render(){
     return (
